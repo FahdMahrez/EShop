@@ -1,6 +1,8 @@
 ﻿namespace EShop.Data
 {
-    public class Gender
+    public enum Gender
     {
+        Male = 0,
+        Female,
     }
 }
