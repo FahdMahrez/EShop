@@ -2,7 +2,7 @@
 
 namespace EShop.Data
 {
-    public class User
+    public class User : BaseEntity
     {
         [Key]
         public Guid Id { get; set; }

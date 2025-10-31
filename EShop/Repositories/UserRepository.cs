@@ -9,10 +9,10 @@ namespace EShop.Repositories
     public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
     {
         public async Task<bool> CreateAsync(User user, CancellationToken cancellationToken)
-        {
+         {  
             await dbContext.Users.AddAsync(user, cancellationToken);
             return await dbContext.SaveChangesAsync(cancellationToken) > 0;
-        }
+         }    
 
         public async Task<bool> DeleteAsync(User user, CancellationToken cancellationToken)
         {
@@ -23,8 +23,8 @@ namespace EShop.Repositories
         public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken)
         {
             return await dbContext.Users
-                           .AsNoTracking()
-                           .ToListAsync(cancellationToken);
+                            .AsNoTracking()
+                            .ToListAsync(cancellationToken);
         }
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
