@@ -2,6 +2,7 @@
 using EShop.Repositories.Interface;
 using EShop.Services;
 using EShop.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EShop.Controllers
@@ -18,6 +19,8 @@ namespace EShop.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Create([FromBody] CreateCategoryDto request)
         {
             if (request == null)
@@ -26,7 +29,7 @@ namespace EShop.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var response = await _categoryService.CreateAsync(reque st);
+            var response = await _categoryService.CreateAsync(request);
 
             if (!response.Success)
                 return BadRequest(response);
@@ -53,6 +56,8 @@ namespace EShop.Controllers
         }
 
         [HttpPut("{Id:guid}")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Update(Guid id, [FromBody] CreateCategoryDto request)
         {
             if (!ModelState.IsValid)
@@ -63,6 +68,8 @@ namespace EShop.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Delete(Guid id)
         {
             var response = await _categoryService.DeleteAsync(id);

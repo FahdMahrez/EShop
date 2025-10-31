@@ -1,12 +1,14 @@
 ﻿using EShop.Dto.ProductModel;
 using EShop.Services;
 using EShop.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EShop.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -17,6 +19,8 @@ namespace EShop.Controllers
         }
 
         [HttpPost("create-product")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Create([FromBody] CreateProductDto request)
         {
             if (request == null)
@@ -49,6 +53,7 @@ namespace EShop.Controllers
                 return NotFound(new { message = response.Message });
 
             return Ok(response);
+       
         }
 
         [HttpGet("category/{categoryId:guid}")]
@@ -66,6 +71,8 @@ namespace EShop.Controllers
         }
 
         [HttpPut("update-product/{product-id}")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Update([FromRoute(Name = "product-id")] Guid id, [FromBody] CreateProductDto request)
         {
             if (request == null)
@@ -80,6 +87,8 @@ namespace EShop.Controllers
         }
 
         [HttpDelete("delete/{product-id}")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var response = await _productService.DeleteAsync(id);
