@@ -10,6 +10,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
+using FluentValidation;
+using EShop.Dto.UserModel;
+using EShop.Validators;
 using FluentValidation.AspNetCore;
 
 
@@ -19,6 +22,13 @@ var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSettings);
 
+builder.Services
+    .AddControllers()
+    .AddFluentValidation(fv =>
+    {
+        fv.RegisterValidatorsFromAssemblyContaining<UserDtoValidator>();
+        fv.DisableDataAnnotationsValidation = true; // optional: disable default [Required] attributes
+    });
 
 builder.Services.AddAuthentication(options =>
 {
