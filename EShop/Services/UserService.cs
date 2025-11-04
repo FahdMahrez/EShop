@@ -1,4 +1,5 @@
 ﻿using BCrypt.Net;
+using EShop.Configurations;
 using EShop.Data;
 using EShop.Dto;
 using EShop.Dto.UserModel;
@@ -19,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace EShop.Services
 {
-    public class UserService(IUserRepository userRepository) : IUserService
+    public class UserService(IUserRepository userRepository, ITokenService tokenService, IUserRoleRepository userRoleRepository) : IUserService
     {
         public async Task<BaseResponse<UserDto>> CreateAsync(UserDto userDto)
         {
@@ -268,22 +269,6 @@ namespace EShop.Services
                 return null;
             }
         }
-        public async Task<BaseResponse<User?>> GetByRefreshTokenAsync(string refreshToken)
-        {
-            try
-            {
-                var user = await userRepository.GetByRefreshTokenAsync(refreshToken, CancellationToken.None);
-                return user == null
-                    ? BaseResponse<User?>.FailResponse("Invalid refresh token.")
-                    : BaseResponse<User?>.SuccessResponse(user, "User retrieved successfully.");
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error fetching user by refresh token");
-                return BaseResponse<User?>.FailResponse("An error occurred while retrieving refresh token.");
-            }
-        }
-
         public async Task<BaseResponse<User?>> RegisterUserAsync(string email, string password)
         {
             try
@@ -408,9 +393,42 @@ namespace EShop.Services
             }
         }
 
-        public Task<BaseResponse<User?>> LoginUserAsync(LoginRequest request)
+        public async Task<BaseResponse<User?>> LoginUserAsync(LoginRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Log.Information("Attempting login for {Email}", request.Email);
+
+                var user = await userRepository.GetByEmailAsync(request.Email);
+                if (user == null)
+                    return new BaseResponse<User?> { Success = false, Message = "Invalid email or password" };
+
+                if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                    return new BaseResponse<User?> { Success = false, Message = "Invalid email or password" };
+
+                var roles = await userRoleRepository.GetRolesByUserIdAsync(user.Id, CancellationToken.None);
+                var accessToken = tokenService.GenerateToken(user, roles.Select(r => r.RoleName));
+                var refreshToken = tokenService.GenerateRefreshToken();
+
+                user.RefreshToken = refreshToken;
+                user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+                await userRepository.UpdateAsync(user, CancellationToken.None);
+
+                Log.Information("User {Email} logged in successfully", user.Email);
+
+                return new BaseResponse<User?>
+                {
+                    Success = true,
+                    Message = "Login successful",
+                    Data = user
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while logging in {Email}", request.Email);
+                return BaseResponse<User?>.FailResponse("An error occurred while logging in.");
+            }
         }
     }
 }

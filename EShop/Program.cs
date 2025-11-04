@@ -14,6 +14,8 @@ using FluentValidation;
 using EShop.Dto.UserModel;
 using EShop.Validators;
 using FluentValidation.AspNetCore;
+using EShop.Configurations;
+
 
 
 
@@ -22,13 +24,12 @@ var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSettings);
 
-builder.Services
-    .AddControllers()
-    .AddFluentValidation(fv =>
-    {
-        fv.RegisterValidatorsFromAssemblyContaining<UserDtoValidator>();
-        fv.DisableDataAnnotationsValidation = true; // optional: disable default [Required] attributes
-    });
+builder.Services.AddControllers();
+
+builder.Services.AddValidatorsFromAssemblyContaining<UserDtoValidator>();
+
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -55,6 +56,13 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+});
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    options.ReportApiVersions = true;
 });
 
 Log.Logger = new LoggerConfiguration()
@@ -126,6 +134,11 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 
 
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+builder.Services.AddSingleton(sp =>
+    builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
+);
 
 
 //Register Services.
@@ -135,8 +148,6 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-
-
 
 
 var app = builder.Build();
@@ -162,7 +173,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+//app.Run();
 
 try
 {

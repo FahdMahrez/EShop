@@ -21,9 +21,7 @@ namespace EShop.Repositories
 
         public async Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await dbContext.Roles
-                            .AsNoTracking()
-                            .ToListAsync(cancellationToken);
+            return await dbContext.Roles.AsNoTracking().ToListAsync(cancellationToken);
         }
 
         public async Task<Role?> GetByIdAsync(Guid id, CancellationToken cancellationToken)

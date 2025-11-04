@@ -48,8 +48,26 @@ namespace EShop.Repositories
 
         public async Task<bool> UpdateAsync(User user, CancellationToken cancellationToken)
         {
-            dbContext.Users.Update(user);
-            return await dbContext.SaveChangesAsync(cancellationToken) > 0;
+            try
+            {
+                var existingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id, cancellationToken);
+                if (existingUser == null)
+                {
+                    Log.Warning("User with Id {UserId} not found while updating", user.Id);
+                    return false;
+                }
+
+                dbContext.Entry(existingUser).CurrentValues.SetValues(user);
+
+                await dbContext.SaveChangesAsync(cancellationToken);
+                Log.Information("User with Id {UserId} updated successfully", user.Id);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred while updating user with Id {UserId}", user.Id);
+                return false;
+            }
         }
         async Task<bool> IUserRepository.UpdateRefreshTokenAsync(Guid userId, string refreshToken, DateTime expiry, CancellationToken cancellationToken)
         {

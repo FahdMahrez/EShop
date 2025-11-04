@@ -98,12 +98,15 @@ namespace EShop.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             Log.Information("Refresh token request received.");
+            
+            if (string.IsNullOrEmpty(request.RefreshToken))
+                return BadRequest("Refresh token is required.");
 
-            var userResponse = await _userService.GetByRefreshTokenAsync(refreshToken, CancellationToken.None);
-
+            var userResponse = await _userService.GetByRefreshTokenAsync(request.RefreshToken, CancellationToken.None);
+           
             if (!userResponse.Success || userResponse.Data == null)
             {
                 Log.Warning("Invalid refresh token attempt.");

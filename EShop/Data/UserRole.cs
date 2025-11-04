@@ -1,11 +1,15 @@
-﻿namespace EShop.Data
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EShop.Data
 {
     public class UserRole : BaseEntity
     {
-        public Guid RoleId { get; set; }
+        [ForeignKey(nameof(User))]
         public Guid UserId { get; set; }
+        public User User { get; set; }
 
-        public User User { get; set; } = null!;
-        public Role Role { get; set; } = null!;
+        [ForeignKey(nameof(Role))]
+        public Guid RoleId { get; set; }
+        public Role Role { get; set; }
     }
 }

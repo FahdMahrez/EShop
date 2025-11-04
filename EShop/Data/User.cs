@@ -4,8 +4,6 @@ namespace EShop.Data
 {
     public class User : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string? OtherName { get; set; }
@@ -15,8 +13,7 @@ namespace EShop.Data
         public string Address { get; set; } = string.Empty;
         public Gender Gender { get; set; }
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
-        public string? RefreshToken { get; set; }
+        public string? RefreshToken { get; set; } = string.Empty;
         public DateTime? RefreshTokenExpiry { get; set; }
-        public DateTime CreatedAt { get; set; }
     }
 }
