@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace EShop.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
