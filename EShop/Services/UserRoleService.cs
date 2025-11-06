@@ -7,7 +7,8 @@ namespace EShop.Services
 {
     public class UserRoleService(IUserRoleRepository userRoleRepository) : IUserRoleService
     {
-        public async Task<BaseResponse<bool>> AssignRoleToUserAsync(Guid userId, Guid roleId)
+
+        public async Task<BaseResponse<bool>> AssignRoleToUserAsync(Guid userId, Guid roleId, CancellationToken cancellationToken)
         {
             try
             {
@@ -27,11 +28,6 @@ namespace EShop.Services
                 Log.Error(ex, "An error occurred while assigning RoleId {RoleId} to UserId {UserId}", roleId, userId);
                 return BaseResponse<bool>.FailResponse("An error occurred while assigning role to user.");
             }
-        }
-
-        public Task<BaseResponse<bool>> AssignRoleToUserAsync(Guid userId, Guid roleId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<BaseResponse<IEnumerable<string>>> GetRolesByUserIdAsync(Guid userId, CancellationToken cancellationToken)

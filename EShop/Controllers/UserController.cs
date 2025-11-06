@@ -66,8 +66,6 @@ namespace EShop.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var response = await _userService.GetAllAsync();
-            if (!response.Success)
-                return NotFound(response.Message);
             return Ok(response);
         }
 
@@ -76,8 +74,6 @@ namespace EShop.Controllers
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var response = await _userService.GetByIdAsync(id, CancellationToken.None);
-            if (!response.Success)
-                return NotFound(response.Message);
             return Ok(response);
         }
 
@@ -85,8 +81,6 @@ namespace EShop.Controllers
         public async Task<IActionResult> CreateUser([FromBody] UserDto userDto)
         {
             var response = await _userService.CreateAsync(userDto);
-            if (!response.Success)
-                return BadRequest(response.Message);
             return Ok(response);
         }
 
@@ -95,29 +89,16 @@ namespace EShop.Controllers
 
         public async Task<IActionResult> AssignRoleToUser(Guid userId, Guid roleId)
         {
-            if (userId == Guid.Empty || roleId == Guid.Empty)
-                return BadRequest(BaseResponse<bool>.FailResponse("Invalid user ID or role ID."));
-
             var result = await _userRoleService.AssignRoleToUserAsync(userId, roleId, CancellationToken.None);
-
-            if (!result.Success)
-                return BadRequest(result);
-
             return Ok(result);
         }
 
         [HttpGet("{userId:guid}/roles")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> GetRolesForUser(Guid userId)
         {
-            if (userId == Guid.Empty)
-                return BadRequest(BaseResponse<IEnumerable<string>>.FailResponse("Invalid user ID."));
-
             var rolesResponse = await _userRoleService.GetRolesByUserIdAsync(userId, CancellationToken.None);
-
-            if (!rolesResponse.Success)
-                return NotFound(rolesResponse);
-
             return Ok(rolesResponse);
         }
 
@@ -125,8 +106,6 @@ namespace EShop.Controllers
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserDto userDto)
         {
             var response = await _userService.UpdateAsync(id, userDto);
-            if (!response.Success)
-                return BadRequest(response.Message);
             return Ok(response);
         }
 
@@ -150,8 +129,6 @@ namespace EShop.Controllers
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             var response = await _userService.DeleteAsync(id);
-            if (!response.Success)
-                return BadRequest(response.Message);
             return Ok(response);
         }
     }

@@ -240,35 +240,6 @@ namespace EShop.Services
             }
         }
        
-        public async Task<User?> ValidateUserAsync(string email, string password)
-        {
-            try
-            {
-                Log.Information("Validating user: {Email}", email);
-
-                var user = await userRepository.GetByEmailAsync(email);
-                if (user == null)
-                {
-                    Log.Warning("User not found: {Email}", email);
-                    return null;
-                }
-
-                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
-                if (!isPasswordValid)
-                {
-                    Log.Warning("Invalid password for: {Email}", email);
-                    return null;
-                }
-
-                Log.Information("User validated successfully: {Email}", email);
-                return user;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error occurred during user validation for {Email}", email);
-                return null;
-            }
-        }
         public async Task<BaseResponse<User?>> RegisterUserAsync(string email, string password)
         {
             try

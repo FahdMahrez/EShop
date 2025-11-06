@@ -14,8 +14,7 @@ using FluentValidation;
 using EShop.Dto.UserModel;
 using EShop.Validators;
 using FluentValidation.AspNetCore;
-using EShop.Configurations;
-
+using EShop;
 
 
 
@@ -137,7 +136,7 @@ builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddSingleton(sp =>
-    builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
+    builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!
 );
 
 
@@ -152,28 +151,26 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var roleRepo = scope.ServiceProvider.GetRequiredService<IRoleRepository>();
-    await RoleSeeder.SeedRolesAsync(roleRepo);
-}
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var roleRepo = services.GetRequiredService<IRoleRepository>();
+    await RoleSeeder.SeedRolesAsync(roleRepo);
+
+    await DataSeeder.SeedAdminAsync(services);
+}
+
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
-//app.Run();
 
 try
 {

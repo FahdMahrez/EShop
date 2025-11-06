@@ -24,28 +24,14 @@ namespace EShop.Controllers
 
         public async Task<IActionResult> Create([FromBody] CreateCategoryDto request)
         {
-            if (request == null)
-                return BadRequest("Request body cannot be null.");
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var response = await _categoryService.CreateAsync(request);
-
-            if (!response.Success)
-                return BadRequest(response);
-
-            return Ok(response);
+            return response.Success ? Ok(response) : BadRequest(response);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var response = await _categoryService.GetByIdAsync(id);
-
-            if (!response.Success)
-                return NotFound(response.Message);
-
             return Ok(response);
         }
 
@@ -61,9 +47,6 @@ namespace EShop.Controllers
 
         public async Task<IActionResult> Update(Guid id, [FromBody] CreateCategoryDto request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest("Invalid data submitted.");
-
             var response = await _categoryService.UpdateAsync(id, request);
             return response.Success ? Ok(response) : BadRequest(response);
         }
