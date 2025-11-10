@@ -10,5 +10,6 @@
         public Category Category { get; set; } = default!;
         public DateTime? ExpiryDate { get; set; }
         public int StockQuantity { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

@@ -21,9 +21,10 @@ namespace EShop.Controllers
         }
 
         [HttpPost("create-product")]
+        [Consumes("multipart/form-data")]
         [Authorize(Roles = "Admin")]
 
-        public async Task<IActionResult> Create([FromBody] CreateProductDto request)
+        public async Task<IActionResult> Create([FromForm] CreateProductDto request)
         {
             var response = await _productService.CreateAsync(request);
             return Ok(response);

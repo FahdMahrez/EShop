@@ -9,5 +9,6 @@
         public decimal CostPrice { get; set; }
         public int StockQuantity { get; set; }
         public Guid CategoryId { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }

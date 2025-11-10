@@ -4,11 +4,12 @@ using EShop.Dto.ProductModel;
 using EShop.Repositories;
 using EShop.Repositories.Interface;
 using EShop.Services.Interface;
+using Humanizer;
 using Serilog;
 
 namespace EShop.Services
 {
-    public class ProductService(IProductRepository productRepository) : IProductService
+    public class ProductService(IProductRepository productRepository, CloudinaryService cloudinaryService) : IProductService
     {
         public async Task<BaseResponse<bool>> CreateAsync(CreateProductDto request)
         {
@@ -30,6 +31,12 @@ namespace EShop.Services
                     CategoryId = request.CategoryId,
                     CreatedAt = DateTime.Now,
                 };
+
+                if (request.ImageFile != null)
+                {
+                    var imageUrl = await cloudinaryService.UploadImageAsync(request.ImageFile);
+                    product.ImageUrl = imageUrl;
+                }
 
                 var result = await productRepository.AddAsync(product, CancellationToken.None);
 

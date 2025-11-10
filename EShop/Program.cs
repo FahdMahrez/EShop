@@ -139,6 +139,14 @@ builder.Services.AddSingleton(sp =>
     builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!
 );
 
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddSingleton(sp =>
+{
+    var config = sp.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+    var account = new CloudinaryDotNet.Account(config.CloudName, config.ApiKey, config.ApiSecret);
+    return new CloudinaryDotNet.Cloudinary(account);
+});
 
 //Register Services.
 builder.Services.AddScoped<IUserService, UserService>();
@@ -147,6 +155,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<CloudinaryService>();
 
 
 var app = builder.Build();

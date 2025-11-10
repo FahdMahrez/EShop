@@ -65,10 +65,6 @@ namespace EShop
 
                 context.UserRoles.Add(userRole);
                 await context.SaveChangesAsync();
-
-                Console.WriteLine("Default Admin created successfully!");
-                Console.WriteLine("Email: admin1@gmail.com");
-                Console.WriteLine("Password: Admin@123");
             }
             else
             {

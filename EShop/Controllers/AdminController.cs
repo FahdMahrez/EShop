@@ -42,7 +42,8 @@ namespace EShop.Controllers
         }
 
         [HttpPost("products")]
-        public async Task<IActionResult> AddProduct([FromBody] CreateProductDto request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> AddProduct([FromForm] CreateProductDto request)
         {
             var result = await _productService.CreateAsync(request);
             return result.Success ? Ok(result) : BadRequest(result);

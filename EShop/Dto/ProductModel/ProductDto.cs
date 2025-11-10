@@ -11,5 +11,6 @@
         public DateTime? ExpiryDate { get; set; }
         public DateTime DateCreated { get; set; }
         public int StockQuantity { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }
